@@ -14,6 +14,7 @@ app.get('/', function (req, res) {
 });
 
 app.post('/', function (req, res) {
+    console.log(req.body);
     console.log(req.body.city); 
 
     let city = req.body.city;
@@ -39,5 +40,5 @@ app.post('/', function (req, res) {
 
 });
 
-const port = 3000;
+const port = 3002;
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
