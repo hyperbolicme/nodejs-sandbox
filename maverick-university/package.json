@@ -1,0 +1,22 @@
+{
+  "name": "maverick-university",
+  "version": "1.0.0",
+  "description": "basic directory website using node js and mongo db",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hyperbolicme/nodejs-sandbox/maverick-university"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^2.6.2",
+    "express": "^4.17.1",
+    "mongodb": "^3.2.7",
+    "pug": "^2.0.4",
+    "require": "^2.4.20"
+  }
+}

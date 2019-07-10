@@ -1,0 +1,28 @@
+<head>
+    <title> <%= title %> </title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css"> 
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+
+</head>
+<body>
+    <div class="container">
+    <h1> <%= title %> </h1>
+
+    
+    <table>
+        <tr>
+            <th class = "t-header">Name</th>
+            <th class = "t-header">Course</th>
+            <th class = "t-header">Specialization</th>
+        </tr>
+
+        <% for ( x in queryResult ) {  %>
+            <tr> 
+                <td> <%= queryResult[x].name %>  </td>
+                <td> <%= queryResult[x].course %>  </td>
+                <td> <%= queryResult[x].specialization %> </td>
+            </tr>
+         <% } %>
+    </table>
+    </div>
+</body>

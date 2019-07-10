@@ -1,0 +1,26 @@
+h1 {
+    text-align: left;
+    color: rgb(18, 57, 102);
+}
+
+
+body {
+  width: 800px;
+  margin: 0 auto;
+  font-family: 'Open Sans', sans-serif;
+}
+
+p {
+  color: #E64A19;
+}
+
+.container {
+  width: 600px;
+  margin: 0 auto;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.t-header {
+    text-align: left;
+    background-color: grey;
+}
