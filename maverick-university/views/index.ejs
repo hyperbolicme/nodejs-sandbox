@@ -8,13 +8,6 @@
     <div class="container">
         <h1> <%= title %> </h1>
 
-        <fieldset class = qa>
-            Show directory.
-            <form action="/search-result-qa" method="post">
-                <button class = qa onclick="/search-result-qa">Go</button>
-            </form>
-        </fieldset>
-
         <fieldset>
             <form action="/search-result" method="post">
                 <input name="id" type="number" class="ghost-input" placeholder="Enter Student ID">
@@ -23,5 +16,13 @@
                 <input type="submit" class="ghost-button" value="Search Directory">
             </form>
         </fieldset>
+
+        <fieldset class=qa>
+            Show directory.
+            <form action="/search-result-qa" method="post">
+                <button class=qa onclick="/search-result-qa">Go</button>
+            </form>
+        </fieldset>
+
     </div>
 </body>

@@ -3,6 +3,10 @@ h1 {
     color: rgb(18, 57, 102);
 }
 
+a {
+
+  text-decoration: none;
+}
 
 body {
   width: 800px;
