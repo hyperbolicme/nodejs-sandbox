@@ -4,6 +4,34 @@ const MongoClient = require("mongodb").MongoClient;
 const bodyParser = require("body-parser");
 const uuid = require("uuid/v4");
 const FileStore = require("session-file-store")(session);
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+
+var users = [
+  {id: '2f24vvg', email: 'test@test.com', password: 'password'}
+];
+
+passport.use(new LocalStrategy(
+    {usernameField: "email"},
+    function(email, password, done){
+        console.log("Inside local strategy callback");
+        // TBD
+        // here is where you make a call to the database
+        // to find the user based on their username or email address
+        // for now, we'll just pretend we found that it was users[0]
+        const user = users[0];
+        if(email === user.email && password === user.password) {
+            console.log("local strategy returned true");
+            return done(null, user);
+        }
+    }
+));
+
+// tell passport how to serialize the user
+passport.serializeUser((user, done) => {
+    console.log('Inside serializeUser callback. User id is save to the session file store here')
+    done(null, user.id);
+});
 
 // Create express server
 const app = express();
@@ -25,9 +53,10 @@ app.use(session({
     resave: false,
     saveUninitialized: true
 }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 const title = "Maverick University directory";
-
 
 // Route /search-result-qa POST
 app.post("/search-result-qa", function(req, resp) {
@@ -69,14 +98,26 @@ app.get("/login-qa", function (req, resp) {
     resp.render("login", {"title": title});
 });
 
-app.post("/login-qa", function (req, resp) {
+app.post("/login-qa", function (req, resp, next) {
     console.log(`Received request POST ${req.url}`);
 
     console.log("Inside the /login-qa POST callback function");
     console.log(req.body);
-    resp.end("You will be logged in soon.");
-});
+//    resp.end("You will be logged in soon.");
 
+    passport.authenticate('local', function(err, user, info) {
+        console.log('Inside passport.authenticate() callback');
+        console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`)
+        console.log(`req.user: ${JSON.stringify(req.user)}`)
+        req.login(user, function(err) {
+            console.log('Inside req.login() callback')
+            console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`)
+            console.log(`req.user: ${JSON.stringify(req.user)}`)
+            return resp.send('You were authenticated & logged in!\n');
+        })
+    })(req, resp, next);
+
+});
 
 // Route /search-result POST
 app.post("/search-result", function (req, resp) {
@@ -120,5 +161,5 @@ app.get("/", function(req, resp){
 
 });
 
-var port = 3001;
+var port = 3000;
 app.listen(port, function() { console.log(`Listening on ${port}`)});
