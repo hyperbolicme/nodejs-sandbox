@@ -12,7 +12,12 @@
             <form action="/search-result" method="post">
                 <input name="id" type="number" class="ghost-input" placeholder="Enter Student ID">
                 <input name="name" type="text" class="ghost-input" placeholder="Enter Name">
-                <input name="course" type="text" class="ghost-input" placeholder="Enter Course">
+                <input name="course" class="ghost-input" placeholder="Pick a course" list = "courses">
+                    <datalist id="courses">
+                        <option>B. Tech</option>
+                        <option>M. S.</option>
+                    </datalist>
+                </select>
                 <input type="submit" class="ghost-button" value="Search Directory">
             </form>
         </fieldset>

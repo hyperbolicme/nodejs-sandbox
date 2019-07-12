@@ -1,16 +1,35 @@
 const express = require("express");
+const session = require("express-session");
 const MongoClient = require("mongodb").MongoClient;
 const bodyParser = require("body-parser");
+const uuid = require("uuid/v4");
+const FileStore = require("session-file-store")(session);
 
-// Initialize Express
+// Create express server
 const app = express();
+
+// Initialize server middleware
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
+app.use(session({
+    genid: function (req) {
+            console.log("---------");
+            console.log("Inside session middleware");
+            console.log(req.sessionID);
+            return uuid();
+        },
+    store: new FileStore(),
+    secret: "tv cat",
+    resave: false,
+    saveUninitialized: true
+}));
 
 const title = "Maverick University directory";
 
-// Route /search-result-qa
+
+// Route /search-result-qa POST
 app.post("/search-result-qa", function(req, resp) {
     console.log(`Received request ${req.url}`);
 
@@ -21,7 +40,6 @@ app.post("/search-result-qa", function(req, resp) {
         var query = { }; // no filter
 
         dbo.collection("students").find(query).sort({student_id: 1}).toArray(function (err, result) {
-        // dbo.collection("students").find(query).sort({ name: 1 }).toArray(function (err, result) {
             resp.render("search-result", { 
                                     title: title, 
                                     queryResult: result
@@ -32,7 +50,35 @@ app.post("/search-result-qa", function(req, resp) {
     });
 });
 
-// Route /search-result
+// Route /session-qa GET
+app.get("/session-qa", function (req, resp) {
+    console.log(`Received request ${req.url}`);
+
+    console.log("Inside the homepage callback function");
+    console.log(req.sessionID);
+    resp.send("Trying out sessions");
+});
+
+// Route /login-qa GET and POST
+app.get("/login-qa", function (req, resp) {
+    console.log(`Received request GET ${req.url}`);
+
+    console.log("Inside the /login-qa GET callback function");
+    console.log(req.sessionID);
+    console.log("Enter login credentials..."); 
+    resp.render("login", {"title": title});
+});
+
+app.post("/login-qa", function (req, resp) {
+    console.log(`Received request POST ${req.url}`);
+
+    console.log("Inside the /login-qa POST callback function");
+    console.log(req.body);
+    resp.end("You will be logged in soon.");
+});
+
+
+// Route /search-result POST
 app.post("/search-result", function (req, resp) {
     console.log(`Received request ${req.url}`);
 
@@ -66,7 +112,7 @@ app.post("/search-result", function (req, resp) {
     });
 });
 
-
+// Route / GET
 app.get("/", function(req, resp){
     resp.render("index", {
         title: title
