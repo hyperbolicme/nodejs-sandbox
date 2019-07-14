@@ -1,4 +1,3 @@
-client/
-*
+client/*
 sessions/*
 output.html
