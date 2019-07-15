@@ -7,7 +7,7 @@ const FileStore = require("session-file-store")(session);
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 
-var users = [
+const users = [
   {id: '2f24vvg', email: 'test@test.com', password: 'password'}
 ];
 
@@ -33,6 +33,13 @@ passport.serializeUser((user, done) => {
     done(null, user.id);
 });
 
+passport.deserializeUser((id, done) => {
+    console.log('Inside deserializeUser callback')
+    console.log(`The user id passport saved in the session file store is: ${id}`)
+    const user = users[0].id === id ? users[0] : false; 
+    done(null, user);
+});
+  
 // Create express server
 const app = express();
 
@@ -58,65 +65,16 @@ app.use(passport.session());
 
 const title = "Maverick University directory";
 
-// Route /search-result-qa POST
-app.post("/search-result-qa", function(req, resp) {
-    console.log(`Received request ${req.url}`);
+// Start server
+var port = 3000;
+app.listen(port, function() { console.log(`Listening on ${port}`)});
 
-    let url = "mongodb://localhost:27017/";
-    MongoClient.connect(url, function (err, db) {
-        if (err) throw err;
-        var dbo = db.db("studentdb");
-        var query = { }; // no filter
-
-        dbo.collection("students").find(query).sort({student_id: 1}).toArray(function (err, result) {
-            resp.render("search-result", { 
-                                    title: title, 
-                                    queryResult: result
-                                });
-            if (err) throw err;
-        });
-        db.close();
+//// Routes and other functions ////
+// Route / GET
+app.get("/", function(req, resp){
+    resp.render("index", {
+        title: title
     });
-});
-
-// Route /session-qa GET
-app.get("/session-qa", function (req, resp) {
-    console.log(`Received request ${req.url}`);
-
-    console.log("Inside the homepage callback function");
-    console.log(req.sessionID);
-    resp.send("Trying out sessions");
-});
-
-// Route /login-qa GET and POST
-app.get("/login-qa", function (req, resp) {
-    console.log(`Received request GET ${req.url}`);
-
-    console.log("Inside the /login-qa GET callback function");
-    console.log(req.sessionID);
-    console.log("Enter login credentials..."); 
-    resp.render("login", {"title": title});
-});
-
-app.post("/login-qa", function (req, resp, next) {
-    console.log(`Received request POST ${req.url}`);
-
-    console.log("Inside the /login-qa POST callback function");
-    console.log(req.body);
-//    resp.end("You will be logged in soon.");
-
-    passport.authenticate('local', function(err, user, info) {
-        console.log('Inside passport.authenticate() callback');
-        console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`)
-        console.log(`req.user: ${JSON.stringify(req.user)}`)
-        req.login(user, function(err) {
-            console.log('Inside req.login() callback')
-            console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`)
-            console.log(`req.user: ${JSON.stringify(req.user)}`)
-            return resp.send('You were authenticated & logged in!\n');
-        })
-    })(req, resp, next);
-
 });
 
 // Route /search-result POST
@@ -153,13 +111,52 @@ app.post("/search-result", function (req, resp) {
     });
 });
 
-// Route / GET
-app.get("/", function(req, resp){
-    resp.render("index", {
-        title: title
-    });
-
+// Route /session GET
+app.get("/session", function (req, resp) {
+    console.log(`Received request ${req.url}`);
+    console.log("Inside the /session callback function");
+    console.log(req.sessionID);
+    resp.send("Trying out sessions");
 });
 
-var port = 3000;
-app.listen(port, function() { console.log(`Listening on ${port}`)});
+// Route /login GET and POST
+app.get("/login", function (req, resp) {
+    console.log(`Received request GET ${req.url}`);
+    console.log("Inside the /login GET callback function");
+    console.log(req.sessionID);
+    console.log("Enter login credentials..."); 
+    resp.render("login", {"title": title});
+});
+
+app.post("/login", function (req, resp, next) {
+    console.log(`Received request POST ${req.url}`);
+    console.log("Inside the /login POST callback function");
+    // console.log(JSON.stringify(req.body));
+//    resp.end("You will be logged in soon.");
+
+    passport.authenticate("local", function(err, user, info) {
+        console.log("Inside passport.authenticate() callback");
+        console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`);
+        console.log(`req.user: ${JSON.stringify(req.user)}`);
+        req.login(user, function(err) {
+            console.log('Inside req.login() callback')
+            console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`)
+            console.log(`req.user: ${JSON.stringify(req.user)}`)
+            return resp.send('You were authenticated & logged in!\n');
+        })
+    })(req, resp, next);
+});
+
+// Route /page-requires-auth GET 
+app.get("/page-requires-auth", function(req, resp, err){
+    console.log("Inside /page-requires-auth GET callback");
+    console.log(`User authenticated? ${req.isAuthenticated()}`);
+    if(req.isAuthenticated()) {
+        resp.send("Page that needs auth.");
+    } else {
+        console.log("Auth failed");
+        resp.redirect("/");
+    }
+         
+});
+
