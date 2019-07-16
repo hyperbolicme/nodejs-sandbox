@@ -29,7 +29,7 @@ passport.use(new LocalStrategy(
 
 // tell passport how to serialize the user
 passport.serializeUser((user, done) => {
-    console.log('Inside serializeUser callback. User id is save to the session file store here')
+    console.log('Inside serializeUser callback. User id is saved to the session file store here')
     done(null, user.id);
 });
 
@@ -72,8 +72,12 @@ app.listen(port, function() { console.log(`Listening on ${port}`)});
 //// Routes and other functions ////
 // Route / GET
 app.get("/", function(req, resp){
+    console.log(`Received request ${req.url}`);
+    console.log("Inside the / callback function");
+    console.log(req.sessionID);
     resp.render("index", {
-        title: title
+        title: title,
+        username: ""
     });
 });
 
@@ -131,18 +135,22 @@ app.get("/login", function (req, resp) {
 app.post("/login", function (req, resp, next) {
     console.log(`Received request POST ${req.url}`);
     console.log("Inside the /login POST callback function");
-    // console.log(JSON.stringify(req.body));
-//    resp.end("You will be logged in soon.");
+    console.log(req.sessionID);
+    console.log(JSON.stringify(req.body));
+    // resp.write("You will be logged in soon.");
 
     passport.authenticate("local", function(err, user, info) {
         console.log("Inside passport.authenticate() callback");
         console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`);
         console.log(`req.user: ${JSON.stringify(req.user)}`);
         req.login(user, function(err) {
-            console.log('Inside req.login() callback')
-            console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`)
-            console.log(`req.user: ${JSON.stringify(req.user)}`)
-            return resp.send('You were authenticated & logged in!\n');
+            console.log('Inside req.login() callback');
+            console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`);
+            console.log(`req.user: ${JSON.stringify(req.user)}`);
+            console.log("User authenticated & logged in!");
+            // return resp.send('You were authenticated & logged in!\n');
+            return resp.render("index", {title: title, username: req.user.email});
+
         })
     })(req, resp, next);
 });

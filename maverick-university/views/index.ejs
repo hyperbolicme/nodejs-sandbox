@@ -8,6 +8,15 @@
     <div class="container">
         <h1> <%= title %> </h1>
 
+        <!-- <div><a href="login/">Login</a></div> -->
+        <div>
+            <% if( username === "" ) { %>
+                <a href="login/">Login</a>
+            <% } else { %>
+                <%= username %>
+            <% } %>
+        
+        </div>
         <fieldset>
             <form action="/search-result" method="post">
                 <input name="id" type="text" class="ghost-input" placeholder="Enter Student ID">
