@@ -77,6 +77,7 @@ app.get("/", function(req, resp){
     console.log(req.sessionID);
     let username = "";
     if( req.isAuthenticated() ){
+        console.log("Authenticated user..")
         username = req.user.email;
     }
     resp.render("index", {
@@ -163,11 +164,17 @@ app.post("/login", function (req, resp, next) {
             console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`);
             console.log(`req.user: ${JSON.stringify(req.user)}`);
             console.log(`User ${req.user.email} authenticated & logged in!`);
-            return resp.render("index", {title: title, username: req.user.email});
+            return resp.redirect("/login2");
 
         })
     })(req, resp, next);
 });
+
+// Route to render home page with right url after login
+app.get("/login2", function(req, resp){
+    resp.redirect("/");
+})
+
 
 // Route /logout GET
 app.get("/logout", function(req, resp){
@@ -175,10 +182,18 @@ app.get("/logout", function(req, resp){
     console.log("Inside the /logout GET callback function");
     console.log(req.sessionID);
     console.log(JSON.stringify(req.body));
-
     req.logout();
-    resp.redirect("back");
+    console.log("logged out");
+    // resp.render("logout", {title: title});
+    resp.redirect( "/logout2");    
 })
+
+// Route to render home page  with right url after logout
+app.get("/logout2", function(req, resp){
+    // resp.render("index", {title: title, username: ""});
+    resp.redirect("/");
+})
+
 
 // Route /page-requires-auth GET 
 app.get("/page-requires-auth", function(req, resp, err){
