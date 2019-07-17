@@ -75,15 +75,30 @@ app.get("/", function(req, resp){
     console.log(`Received request ${req.url}`);
     console.log("Inside the / callback function");
     console.log(req.sessionID);
+    let username = "";
+    if( req.isAuthenticated() ){
+        username = req.user.email;
+    }
     resp.render("index", {
         title: title,
-        username: ""
+        username: username
     });
 });
 
 // Route /search-result POST
 app.post("/search-result", function (req, resp) {
     console.log(`Received request ${req.url}`);
+    let username = "";
+    if( req.isAuthenticated() ){
+        username = req.user.email;
+    } else {
+        resp.render("search-result", {
+            title: title,
+            queryResult: {},
+            username: ""
+        });
+        return;
+    }
 
     let url = "mongodb://localhost:27017/";
     console.log(req.body);
@@ -107,7 +122,8 @@ app.post("/search-result", function (req, resp) {
             
             resp.render("search-result", {
                 title: title,
-                queryResult: result
+                queryResult: result,
+                username: username
             });
             if (err) throw err;
         });
@@ -137,7 +153,6 @@ app.post("/login", function (req, resp, next) {
     console.log("Inside the /login POST callback function");
     console.log(req.sessionID);
     console.log(JSON.stringify(req.body));
-    // resp.write("You will be logged in soon.");
 
     passport.authenticate("local", function(err, user, info) {
         console.log("Inside passport.authenticate() callback");
@@ -147,13 +162,23 @@ app.post("/login", function (req, resp, next) {
             console.log('Inside req.login() callback');
             console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`);
             console.log(`req.user: ${JSON.stringify(req.user)}`);
-            console.log("User authenticated & logged in!");
-            // return resp.send('You were authenticated & logged in!\n');
+            console.log(`User ${req.user.email} authenticated & logged in!`);
             return resp.render("index", {title: title, username: req.user.email});
 
         })
     })(req, resp, next);
 });
+
+// Route /logout GET
+app.get("/logout", function(req, resp){
+    console.log(`Received request GET ${req.url}`);
+    console.log("Inside the /logout GET callback function");
+    console.log(req.sessionID);
+    console.log(JSON.stringify(req.body));
+
+    req.logout();
+    resp.redirect("back");
+})
 
 // Route /page-requires-auth GET 
 app.get("/page-requires-auth", function(req, resp, err){

@@ -9,6 +9,15 @@
     <a href="/"><h1> <%= title %> </h1> </a>
 
     <a href="/"> Search again. </a>
+    <div class = "username">
+        <% if( username === "" ) { %>
+            <a href="login/">Login</a>
+        <% } else { %>
+            <%= username %> is logged in.
+        <% } %> 
+    
+    </div>
+
     <table>
         <tr>
             <th class = "t-header">ID</th>

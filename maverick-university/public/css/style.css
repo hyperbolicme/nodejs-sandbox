@@ -18,6 +18,9 @@ p {
   color: #E64A19;
 }
 
+.username{
+  font-size: 10px;
+}
 .container {
   width: 600px;
   margin: 0 auto;
