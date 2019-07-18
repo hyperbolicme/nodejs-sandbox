@@ -1,19 +1,18 @@
 <head>
-    <title> <%= title %> </title>
-    <link rel="stylesheet" type="text/css" href="/css/style.css"> 
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
-
-</head>
-<body>
-    <div class="container">
-        <h1> <%= title %> </h1>
+        <%- include( "include/header", {title: title}   ); %>
+    </head>
+    
+    <body>
+        <div class="container">
+                <!-- <a href="/"><h1> <%= title %> </h1> </a> -->
+                <!-- <%- include( "include/top-page", {title: title, username: username} ); %> -->
 
         <fieldset>
             <form action="/login" method="post">
                 <input name="email" type="email" class="ghost-input" placeholder="Email">
                 <input name="password" type="password" class="ghost-input" placeholder="Password">
                 
-                <input type="submit" class="ghost-button" value="Login">
+                <input type="submit" class="btn btn-primary" value="Login">
             </form>
         </fieldset>
     </div>

@@ -1,23 +1,22 @@
 <head>
-    <title> <%= title %> </title>
-    <link rel="stylesheet" type="text/css" href="/css/style.css"> 
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
-
+    <%- include( "include/header", {title: title}   ); %>
 </head>
+
 <body>
     <div class="container">
-        <h1> <%= title %> </h1>
+        <%- include( "include/top-page", {title: title, username: username} ); %>
 
-        <!-- <div><a href="login/">Login</a></div> -->
-        <div class = "username">
-            <% if( username === "" ) { %>
-                <a href="login/">Login</a>
-            <% } else { %>
-                <b> <%= username %> </b> is logged in.  
-                <a href="logout/">Logout</a> 
-            <% } %>
-        </div>
-        
+<!-- 
+        <div class="container">
+
+                <div class="starter-template">
+                  <h1>Welcome to Maverick University directory portal.</h1>
+                  <p class="lead">Sign in to use the site.</p>
+                </div>
+          
+        </div>--><!-- /.container -->
+ 
+        <div class = "container">
         <fieldset>
             <form action="/search-result" method="post">
                 <input name="id" type="text" class="ghost-input" placeholder="Enter Student ID">
@@ -28,9 +27,10 @@
                         <option>M. S.</option>
                     </datalist>
                 </select>
-                <input type="submit" class="ghost-button" value="Search Directory">
+                <!-- <input type="submit" class="ghost-button" value="Search Directory"> -->
+                <input type="submit" class="btn btn-primary" value="Search Directory">
             </form>
         </fieldset>
-
+    </div>
     </div>
 </body>

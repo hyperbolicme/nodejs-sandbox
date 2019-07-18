@@ -1,46 +1,36 @@
 <head>
-    <title> <%= title %> </title>
-    <link rel="stylesheet" type="text/css" href="/css/style.css"> 
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
-
-</head>
-<body>
-    <div class="container">
-    <a href="/"><h1> <%= title %> </h1> </a>
-
-    <a href="/"> Search again. </a>
-    <div class = "username">
-        <% if( username === "" ) { %>
-            <a href="login/">Login</a>
-        <% } else { %>
-            <%= username %> is logged in.
-            <a href="logout/">Logout</a> 
-        <% } %> 
+        <%- include( "include/header", {title: title}   ); %>
+    </head>
     
-    </div>
+    <body>
+        <div class="container">
+            <%- include( "include/top-page", {title: title, username: username} ); %>
+            <!-- <a href="/"> Search again. </a> -->
 
-    <table>
-        <tr>
-            <th class = "t-header">ID</th>
-            <th class = "t-header">Name</th>
-            <th class = "t-header">Course</th>
-            <th class = "t-header">Specialization</th>
-        </tr>
+            <div class = "container-fluid">
 
-        <% 
-        var i = 0;
-        for ( x in queryResult ) {  
-            i++; %>
-            <tr> 
-                <td> <%= queryResult[x].student_id %> </td>
-                <td class = "name"> <%= queryResult[x].name %>  </td>
-                <td class = "course"> <%= queryResult[x].course %>  </td>
-                <td class = "spec"> <%= queryResult[x].specialization %> </td>
+            <table class = "table table-striped">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Course</th>
+                <th>Specialization</th>
             </tr>
-         <% } %>
-    </table>
-    
-    <h5> <%= i %> results. </h5>
+
+            <% 
+            var i = 0;
+            for ( x in queryResult ) {  
+                i++; %>
+                <tr> 
+                    <td> <%= queryResult[x].student_id %> </td>
+                    <td class = "name"> <%= queryResult[x].name %>  </td>
+                    <td class = "course"> <%= queryResult[x].course %>  </td>
+                    <td class = "spec"> <%= queryResult[x].specialization %> </td>
+                </tr>
+            <% } %>
+            </table>
+            </div>
+        <h5> <%= i %> results. </h5>
     
     </div>
 </body>

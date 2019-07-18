@@ -1,3 +1,14 @@
 client/*
 sessions/*
 output.html
+views/_bootstrap_101.html
+../bootstrap-3.4.1-dist/
+../bootstrap-3.4.1/
+views/bootstrap.min.js
+views/index_boot.ejs
+views/jquery.min.js
+views/login_boot.ejs
+views/search_boot.ejs
+views/search_result_boot.ejs
+../package-lock.json
+

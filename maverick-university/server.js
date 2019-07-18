@@ -75,7 +75,8 @@ app.get("/", function(req, resp){
     console.log(`Received request ${req.url}`);
     console.log("Inside the / callback function");
     console.log(req.sessionID);
-    let username = "";
+    // let username = req.isAuthenticated() ? req.user.email : "";
+    let username = ""; 
     if( req.isAuthenticated() ){
         console.log("Authenticated user..")
         username = req.user.email;
@@ -86,9 +87,13 @@ app.get("/", function(req, resp){
     });
 });
 
+app.get("/search-result", function (req, resp) {
+    resp.redirect("/");
+});
 // Route /search-result POST
 app.post("/search-result", function (req, resp) {
     console.log(`Received request ${req.url}`);
+    // let username = req.isAuthenticated() ? req.user.email : "";
     let username = "";
     if( req.isAuthenticated() ){
         username = req.user.email;
@@ -146,7 +151,7 @@ app.get("/login", function (req, resp) {
     console.log("Inside the /login GET callback function");
     console.log(req.sessionID);
     console.log("Enter login credentials..."); 
-    resp.render("login", {"title": title});
+    resp.render("login", {"title": title, "username": req.isAuthenticated() ? req.user.email : ""});
 });
 
 app.post("/login", function (req, resp, next) {
@@ -154,6 +159,10 @@ app.post("/login", function (req, resp, next) {
     console.log("Inside the /login POST callback function");
     console.log(req.sessionID);
     console.log(JSON.stringify(req.body));
+    if (req.body.email === "" || req.body.password === ""){
+        return resp.redirect("/login");
+
+    }
 
     passport.authenticate("local", function(err, user, info) {
         console.log("Inside passport.authenticate() callback");
@@ -194,17 +203,4 @@ app.get("/logout2", function(req, resp){
     resp.redirect("/");
 })
 
-
-// Route /page-requires-auth GET 
-app.get("/page-requires-auth", function(req, resp, err){
-    console.log("Inside /page-requires-auth GET callback");
-    console.log(`User authenticated? ${req.isAuthenticated()}`);
-    if(req.isAuthenticated()) {
-        resp.send("Page that needs auth.");
-    } else {
-        console.log("Auth failed");
-        resp.redirect("/");
-    }
-         
-});
 

@@ -1,0 +1,46 @@
+
+    <!-- <a href="/"><h1> <%= title %> </h1> </a> -->
+ 
+    <!-- <div class = "username">
+        <% if( username === "" ) { %>
+            <a href="login/">Login</a>
+        <% } else { %>
+            <b> <%= username %> </b> is logged in.  
+            <a href="logout/">Logout</a> 
+        <% } %>
+    </div>     -->
+
+<div class = "container" >
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+              <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">Maverick directory</a>
+              </div>
+              <div id="navbar" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                  <!-- NAV BAR TEMPLATE -->
+                  <li class="active">
+                          <% if( username === "" ) { %>
+                              <a href="login/">Login</a>
+                          <% } else { %>
+                            <a href="#"> <%= username %> </a>
+                          <% } %>     
+                  </li>
+                  <!-- <li class="active"> TEST </li> -->
+                  <li class="active"><a href="search-result/">Search</a></li>
+                  <!-- Add logout link if logged in -->
+                  <% if( username !== "" ) { %>
+                  <li class="active"><a href="logout/">Logout</a></li>
+                  <% } %>
+                <!-- NAV BAR TEMPLATE END -->
+                </ul>
+              </div><!--/.nav-collapse -->
+            </div>
+          </nav>
+</div>
