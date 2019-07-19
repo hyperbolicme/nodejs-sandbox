@@ -15,8 +15,8 @@
                 </div>
           
         </div>--><!-- /.container -->
- 
         <div class = "container">
+        <% if(username !== "") { %>
         <fieldset>
             <form action="/search-result" method="post">
                 <input name="id" type="text" class="ghost-input" placeholder="Enter Student ID">
@@ -31,6 +31,11 @@
                 <input type="submit" class="btn btn-primary" value="Search Directory">
             </form>
         </fieldset>
-    </div>
+    <% } else { %>
+        <p> <a href="login/">Login</a> to use the directory.</p>
+
+    <% } %>
+        
+    </div>        
     </div>
 </body>
