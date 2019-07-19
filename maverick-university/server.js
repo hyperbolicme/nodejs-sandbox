@@ -15,76 +15,46 @@ const mongoDirectoryDb = "studentdb";
 const mongoStudentCollection = "students";
 const mongoCredsCollection = "usercreds";
 
+// Mongodb querying logic is mostly common except
+// the call back in .toArray() / what you do with result.
+function queryDb(dbname, collectionName, query, callback){
+    MongoClient.connect(mongoUrl, 
+        function (err, db) {
+            // call the database to find the user based on their username or email address
+            if (err){
+                console.log("Local strategy failed. Encountered db err.");
+                return done(err);
+            }      
+
+            // Connect
+            var dbo = db.db(dbname);
+
+            // Query username and password
+            // let query = {username: email, password: password};
+            console.log(`Query on collection ${collectionName}: ${JSON.stringify(query)}`)
+            let qresult = dbo.collection(collectionName).find(query);
+
+            // pass the intended callback to result.
+            qresult.toArray(callback);
+            db.close();
+        });    
+};
+
+// Configure LocalStrategy to define how user verification is done.
 passport.use(new LocalStrategy(
     {usernameField: "email"},
     function(email, password, done){
         console.log("Inside local strategy callback");
-        MongoClient.connect(mongoUrl, 
-            function (err, db) {
-                // here is where you make a call to the database
-                // to find the user based on their username or email address
+        let query = {username: email, password: password};
+        queryDb(mongoDirectoryDb, 
+            mongoCredsCollection, 
+            query, 
+            function (err, result) {            
+                console.log(`Query result: ${JSON.stringify(result)}`);
                 if (err){
-                    console.log("Local strategy failed. Encountered db err.");
+                    console.log("Local strategy failed.");
                     return done(err);
                 }      
-
-                // Connect
-                var dbo = db.db(mongoDirectoryDb);
-
-                // Query username and password
-                let query = {username: email, password: password};
-                console.log(`Query on collection ${mongoCredsCollection}: ${JSON.stringify(query)}`)
-                let qresult = dbo.collection(mongoCredsCollection).find(query);
-                qresult.toArray(function (err, result) {            
-                    console.log(`Query result: ${JSON.stringify(result)}`);
-                    if (err){
-                        console.log("Local strategy failed.");
-                        return done(err);
-                    }      
-                    if(result.length === 0){
-                        console.log("Local strategy returns FALSE. No creds match.");
-                        return done(null, false);
-                    } 
-                    console.log(`Local strategy returned true. ${JSON.stringify(result[0])}`);
-                    return done(null, 
-                        {id: result[0]._id, 
-                            email: result[0].username, 
-                            password: result[0].password});
-    
-                });
-                db.close();
-            });
-}));
-
-// tell passport how to serialize the user
-passport.serializeUser( function(user, done) {
-    console.log('Inside serializeUser callback. User id is saved to the session file store here')
-    done(null, user.id);
-});
-
-// input - db url, collection name, query in json
-// output - array or results.
-//   queryDBCollection()
-
-passport.deserializeUser( function(id, done) {
-    console.log('Inside deserializeUser callback')
-    console.log(`The user id passport saved in the session file store is: ${id}`)
-
-    MongoClient.connect(mongoUrl, 
-        function (err, db) {
-            if (err) return done(err);
-            
-            // Connect
-            var dbo = db.db(mongoDirectoryDb);
-
-            // Query id in db
-            let query = {_id: ObjectID(id) };
-            console.log(`Query on collection ${mongoCredsCollection}: ${JSON.stringify(query)}`)
-            let qresult = dbo.collection(mongoCredsCollection).find(query);
-            qresult.toArray(function (err, result) {            
-                console.log(`Query result: ${JSON.stringify(result)}`);
-                if(err) return done(err);
-
                 if(result.length === 0){
                     console.log("Local strategy returns FALSE. No creds match.");
                     return done(null, false);
@@ -95,9 +65,37 @@ passport.deserializeUser( function(id, done) {
                         email: result[0].username, 
                         password: result[0].password});
             });
-            db.close();
-        });
-    
+}));
+
+// tell passport how to serialize and deserialize the user
+passport.serializeUser( function(user, done) {
+    console.log('Inside serializeUser callback. User id is saved to the session file store here')
+    done(null, user.id);
+});
+
+passport.deserializeUser( function(id, done) {
+    console.log('Inside deserializeUser callback')
+    console.log(`The user id passport saved in the session file store is: ${id}`)
+
+    // Query id in db
+    let query = {_id: ObjectID(id) };
+    queryDb(mongoDirectoryDb, 
+        mongoCredsCollection, 
+        query, 
+        function (err, result) {            
+            console.log(`Query result: ${JSON.stringify(result)}`);
+            if(err) return done(err);
+
+            if(result.length === 0){
+                console.log("Local strategy returns FALSE. No creds match.");
+                return done(null, false);
+            } 
+            console.log(`Local strategy returned true. ${JSON.stringify(result[0])}`);
+            return done(null, 
+                {id: result[0]._id, 
+                    email: result[0].username, 
+                    password: result[0].password});
+        });    
 });
   
 // Create express server
@@ -146,10 +144,11 @@ app.get("/", function(req, resp){
     });
 });
 
+// Route /search-result GET and POST
 app.get("/search-result", function (req, resp) {
     resp.redirect("/");
 });
-// Route /search-result POST
+
 app.post("/search-result", 
     function (req, resp) {
         console.log(`Received request ${req.url}`);
@@ -166,40 +165,30 @@ app.post("/search-result",
             return;
         }
 
-        console.log(req.body);
-        MongoClient.connect(mongoUrl, 
-            function (err, db) {
-                if (err) throw err;
-                var dbo = db.db(mongoDirectoryDb);
+        console.log(`Received ${JSON.stringify(req.body)} from client.`);
 
-                // Get filter from req object using only non empty values
-                // entered by user
-                let query = {};
-                // id is read as text
-                if (req.body.id !== "")
-                    query.student_id = parseInt(req.body.id);
-                // Use regex. "i" is case insensitive search
-                if (req.body.name !== "") 
-                    query.name = { $regex: `${req.body.name}`, $options: "i" }; 
-                if (req.body.course !== "")
-                    query.course = { $regex: `${req.body.course}`, $options: "i" };                
-                console.log(`Query is ${JSON.stringify(query)}`); 
+        // Get filter from req object using only non empty values
+        // entered by user
+        // Use regex. "i" is case insensitive search
+        let query = {}, dummy = 1;
+        req.body.id !== "" ?        query.student_id = parseInt(req.body.id) : dummy; 
+        req.body.name !== "" ?      query.name = { $regex: `${req.body.name}`, $options: "i" }  : dummy;
+        req.body.course !== "" ?    query.course = { $regex: `${req.body.course}`, $options: "i" }  : dummy;
+        console.log(`Query is ${JSON.stringify(query)}`); 
 
-                // Query collection and sort by student ID. Convert to array
-                let qresult = dbo.collection(mongoStudentCollection).find(query);
-                let qresultSorted = qresult.sort({ student_id: 1 });
-                qresultSorted.toArray(function (err, result) {            
-                    console.log(result);
-                    
-                    resp.render("search-result", {
-                        title: title,
-                        queryResult: result,
-                        username: username
-                    });
-                    if (err) throw err;
+        queryDb(mongoDirectoryDb, 
+            mongoStudentCollection, 
+            query, 
+            function (err, result) {            
+                console.log(`Found ${result.length} entries.`);
+                
+                resp.render("search-result", {
+                    title: title,
+                    queryResult: result,
+                    username: username
                 });
-                db.close();
-        });
+                if (err) throw err;
+            });
 });
 
 // Route /session GET
