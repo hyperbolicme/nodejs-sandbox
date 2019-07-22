@@ -7,6 +7,8 @@ const uuid = require("uuid/v4");
 const FileStore = require("session-file-store")(session);
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
+const url = require("url");
+
 
 const mongoAdmin = "akira";
 const mongoAdminPass = "welcomehome";
@@ -39,6 +41,7 @@ function queryDb(dbname, collectionName, query, callback){
             db.close();
         });    
 };
+
 
 // Configure LocalStrategy to define how user verification is done.
 passport.use(new LocalStrategy(
@@ -123,7 +126,7 @@ app.use(passport.session());
 const title = "Maverick University directory";
 
 // Start server
-var port = 3000;
+const port = 3000;
 app.listen(port, function() { console.log(`Listening on ${port}`)});
 
 //// Routes and other functions ////
@@ -132,12 +135,12 @@ app.get("/", function(req, resp){
     console.log(`Received request ${req.url}`);
     console.log("Inside the / callback function");
     console.log(req.sessionID);
-    // let username = req.isAuthenticated() ? req.user.email : "";
-    let username = ""; 
-    if( req.isAuthenticated() ){
-        console.log("Authenticated user..")
-        username = req.user.email;
-    }
+    let username = req.isAuthenticated() ? req.user.email : "";
+    // let username = ""; 
+    // if( req.isAuthenticated() ){
+    //     console.log("Authenticated user..")
+    //     username = req.user.email;
+    // }
     resp.render("index", {
         title: title,
         username: username
@@ -210,7 +213,7 @@ app.get("/login", function (req, resp) {
 
 app.post('/login', 
    passport.authenticate('local', 
-       { successRedirect: '/',
+       { successRedirect: '/login2',
          failureRedirect: '/login' }));
 
 /* Default error page 401 
@@ -252,10 +255,10 @@ app.post('/login',
 //     })(req, resp, next);
 // });
 
-// // Route to render home page with right url after login
-// app.get("/login2", function(req, resp){
-//     resp.redirect("/");
-// })
+// Route to render home page with right url after login
+app.get("/login2", function(req, resp){
+    resp.redirect("/");
+})
 
 
 // Route /logout GET
@@ -266,14 +269,28 @@ app.get("/logout", function(req, resp){
     console.log(JSON.stringify(req.body));
     req.logout();
     console.log("logged out");
-    // resp.render("logout", {title: title});
     resp.redirect( "/logout2");    
 })
 
 // Route to render home page  with right url after logout
 app.get("/logout2", function(req, resp){
-    // resp.render("index", {title: title, username: ""});
     resp.redirect("/");
 })
 
+// Route /user?id=<id> to show user details
+// app.get("/user/:id", function(req, resp){
+app.get("/user", function(req, resp){
 
+    console.log(`id = ${req.query.id}`);
+
+    queryDb(mongoDirectoryDb,
+        mongoStudentCollection,
+        {student_id: parseInt(req.query.id)},
+        function(err, result){
+            console.log(result);
+            resp.render("user_profile_view", {title: title, 
+                username: req.isAuthenticated() ? req.user.email : "",
+                user_profile: result[0]});
+        });
+    
+});

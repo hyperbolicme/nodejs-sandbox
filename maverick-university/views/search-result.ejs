@@ -22,8 +22,10 @@
             for ( x in queryResult ) {  
                 i++; %>
                 <tr> 
-                    <td> <%= queryResult[x].student_id %> </td>
-                    <td class = "name"> <%= queryResult[x].name %>  </td>
+                    <% userid = queryResult[x].student_id %>
+                    <td> <%= userid %> </td>
+                    <!-- <td class = "name"> <a href="user/:id=<%=userid%>"> <%= queryResult[x].name %> </a> </td> -->
+                    <td class = "name"> <a href="user?id=<%=userid%>"> <%= queryResult[x].name %> </a> </td>
                     <td class = "course"> <%= queryResult[x].course %>  </td>
                     <td class = "spec"> <%= queryResult[x].specialization %> </td>
                 </tr>
