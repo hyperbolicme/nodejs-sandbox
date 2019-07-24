@@ -35,12 +35,10 @@ function queryDb(dbname, collectionName, query, callback) {
             // Query username and password
             console.log(`Query on collection ${collectionName}: ${JSON.stringify(query)}`)
             let qresult = dbo.collection(collectionName).find(query);
-            // console.log(`qresult = ${JSON.stringify(qresult)}`);
-            qresult.forEach(function(r){ console.log(r) });
 
             // pass the intended callback to result.
             qresult.toArray(callback);
-            db.close();
+            // db.close();
         });
 };
 
@@ -180,30 +178,29 @@ app.post("/search-result",
 
         console.log(`Received ${JSON.stringify(req.body)} from client.`);
 
+
         // Get filter from req object using only non empty values
         // entered by user
         // Use regex. "i" is case insensitive search
         let query = {};
 
         req.body.ul_friend_name !== "" ?
-            query["display_name"] = { $regex: `${req.body.ul_friend_name}`, $options: "i" }  : { };
+            query["display_name"] = { $regex: `${req.body.ul_friend_name}`, $options: "i" } : {};
         req.body.ul_email !== "" ?
-            query["email_id"] = { $regex: `${req.body.ul_email}`, $options: "i" }  : { };
+            query["email_id"] = { $regex: `${req.body.ul_email}`, $options: "i" } : {};
         req.body.ul_location !== "" ?
-            query["display_city"] = { $regex: `${req.body.ul_location}`, $options: "i" }  : { };
+            query["display_city"] = { $regex: `${req.body.ul_location}`, $options: "i" } : {};
         req.body.ul_location_lat !== "" ?
-            query["latitude"] = { $regex: `${req.body.ul_location_lat}`, $options: "i" }  : { };
+            query["latitude"] = { $regex: `${req.body.ul_location_lat}`, $options: "i" } : {};
         req.body.ul_location_lng !== "" ?
-            query["longitude"] = { $regex: `${req.body.ul_location_lng}`, $options: "i" }  : { };
+            query["longitude"] = { $regex: `${req.body.ul_location_lng}`, $options: "i" } : {};
         req.body.ul_designation !== "" ?
-            query["current_designation"] = { $regex: `${req.body.ul_designation}`, $options: "i" }  : { };
+            query["current_designation"] = { $regex: `${req.body.ul_designation}`, $options: "i" } : {};
         req.body.city_ids !== "" ?
-            query["city_id"] = { $regex: `${req.body.city_ids}`, $options: "i" }  : { };
-
-
-
+            query["city_id"] = { $regex: `${req.body.city_ids}`, $options: "i" } : {};
 
         console.log(`Query is ${JSON.stringify(query)}`);
+        var start_time = new Date();
 
         queryDb(mongoDirectoryDb,
             mongoDirectoryCollection,
@@ -214,14 +211,24 @@ app.post("/search-result",
                     resp.end();
                 }
                 console.log(`Found ${result.length} entries.`);
-                console.log(`${JSON.stringify(result)}`);
+                // console.log(`${JSON.stringify(result)}`);
+
+                var end_time = new Date();
+                var time_diff = (end_time - start_time) / 1000;
+                console.log(`Took ${time_diff} seconds to fetch.`)
 
                 resp.render("search-result_mat", {
                     title: title,
                     queryResult: result,
-                    username: username
+                    username: username,
+                    timeDiff: time_diff
                 });
             });
+        // end_time2 = new Date();
+        // time_diff2 = (end_time2 - start_time) / 1000;
+        // console.log(`Took ${time_diff2} seconds to fetch2.`)
+
+
     });
 
 // Route /session GET
@@ -247,45 +254,6 @@ app.post('/login',
             successRedirect: '/login2',
             failureRedirect: '/login_mat'
         }));
-
-/* Default error page 401 
-*/
-// app.post('/login', 
-//     passport.authenticate('local'), 
-//     function(req, resp) { 
-//         resp.redirect("/");
-//     }
-// );
-
-
-/* Using a custom authentication callback. 
-   gives access to req and resp
-   user's responsibility to call req.login() 
-*/
-// app.post("/login", function (req, resp, next) {
-//     console.log(`Received request POST ${req.url}`);
-//     console.log("Inside the /login POST callback function");
-//     console.log(req.sessionID);
-//     console.log(JSON.stringify(req.body));
-//     if (req.body.email === "" || req.body.password === ""){
-//         return resp.redirect("/login");
-//     }
-
-//     passport.authenticate("local", function(err, user, info) {
-//         console.log("Inside passport.authenticate() callback");
-//         console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`);
-//         console.log(`req.user: ${JSON.stringify(req.user)}`);
-//         req.login(user, function(err) {
-//             console.log('Inside req.login() callback');
-//             if(err) {return next(err);}
-//             if(!user){ return resp.redirect("/login");}
-//             console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`);
-//             console.log(`req.user: ${JSON.stringify(req.user)}`);
-//             console.log(`User ${req.user.email} authenticated & logged in!`);
-//             return resp.redirect("/login2");
-//         })
-//     })(req, resp, next);
-// });
 
 // Route to render home page with right url after login
 app.get("/login2", function (req, resp) {
@@ -317,7 +285,7 @@ app.get("/user", function (req, resp) {
 
     queryDb(mongoDirectoryDb,
         mongoDirectoryCollection,
-        { student_id: parseInt(req.query.id) },
+        { "user_id": parseInt(req.query.id) },
         function (err, result) {
             console.log(result);
             resp.render("user_profile_view_mat", {

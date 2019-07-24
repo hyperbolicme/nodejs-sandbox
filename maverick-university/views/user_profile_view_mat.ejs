@@ -4,46 +4,51 @@
 
 <body>
     <!-- <div class="container"> -->
-        <%- include( "include/top-page_mat", {username: username} ); %>
+    <%- include( "include/top-page_mat", {username: username} ); %>
 
-        <div class="container-fluid">
+    <div class="container-fluid">
 
-            <h1 class="name"><%= user_profile.fname %> <%= user_profile.lname %></h1>
+        <h1 class="cap"><%= user_profile["display_name"] %></h1>
 
-            <table class="table table-striped">
-                <tr>
-                    <th>ID</th>
-                    <td> <%= user_profile.student_id %> </td>
-                </tr>
-                <tr>
-                    <th>First Name</th>
-                    <td class="name"> <%= user_profile.fname %> </td>
-                </tr>
-                <tr>
-                    <th>Last Name</th>
-                    <td class="name"> <%= user_profile.lname %> </td>
-                </tr>
-                <tr>
-                    <th>Course</th>
-                    <td class="course"> <%= user_profile.course %> </td>
-                </tr>
-                <tr>
-                    <th>Specialication</th>
-                    <td class="spec"> <%= user_profile.specialization %> </td>
-                </tr>
-                <tr>
-                    <th>Batch</th>
-                    <td> <%= user_profile.batch %> </td>
-                </tr>
-                <tr>
-                    <th>Phone</th>
-                    <td> <%= user_profile.phone %> </td>
-                </tr>
-            </table>
-            <!-- <form >
+
+        <table class="table responsive-table highlight">
+            <tr>
+                <th>ID</th>
+                <td> <%= user_profile["user_id"] %> </td>
+            </tr>
+            <tr>
+                <th>First Name</th>
+                <td class="cap"> <%= user_profile["first_name"] %> </td>
+            </tr>
+            <tr>
+                <th>Middle Name</th>
+                <td class="cap"> <%= user_profile["middle_name"] %> </td>
+            </tr>
+            <tr>
+                <th>Last Name</th>
+                <td class="cap"> <%= user_profile["last_name"] %> </td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td> <%= user_profile["email_id"] %> </td>
+            </tr>
+            <tr>
+                <th>City</th>
+                <td class="cap"> <%= user_profile["display_city"] %> </td>
+            </tr>
+            <tr>
+                <th>Institute</th>
+                <td class="cap"> <%= user_profile["institution_name"] %> </td>
+            </tr>
+            <tr>
+                <th>Designation</th>
+                <td class="cap"> <%= user_profile["current_designation"] %> </td>
+            </tr>
+        </table>
+        <!-- <form >
                 <input type="submit" class="btn btn-primary" value="Go back to search results" onClick="javascript:history.go(-1)">
             </form> -->
 
-        </div>
+    </div>
     </div>
 </body>

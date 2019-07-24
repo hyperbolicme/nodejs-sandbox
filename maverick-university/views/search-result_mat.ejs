@@ -9,27 +9,26 @@
 
     <div class="container-fluid">
         <%= queryResult.length %> results found.
+        <% if(typeof timeDiff != 'undefined') { %> Took <%= timeDiff %> seconds. <% } %>
 
-        <table class="table responsive-table highlight"> 
+        <table class="table responsive-table highlight">
             <tr>
                 <th>ID</th>
                 <th>Name</th>
-                <th>Course</th>
-                <th>Specialization</th>
+                <th>City</th>
+                <th>Company</th>
             </tr>
             <% 
             for ( x in queryResult ) {
             %>
             <tr>
-                <% userid = queryResult[x].student_id %>
+                <% var userid = queryResult[x]["user_id"] %>
                 <td> <%= userid %> </td>
-                <!-- <td class = "name"> <a href="user/:id=<%=userid%>"> <%= queryResult[x].name %> </a> </td> -->
-                <td class="name"> <a href="user?id=<%=userid%>">
-                        <%= queryResult[x].fname %> <%= queryResult[x].lname %> </a>
+                <td class="cap">
+                    <a href="user?id=<%= userid %>"> <%= queryResult[x]["display_name"] %> </a>
                 </td>
-                <!-- <td class = "name"> <a href="user?id=<%=userid%>"> <%=  %> </a> </td> -->
-                <td class="course"> <%= queryResult[x].course %> </td>
-                <td class="spec"> <%= queryResult[x].specialization %> </td>
+                <td class="cap"> <%= queryResult[x]["display_city"] %> </td>
+                <td class="cap"> <%= queryResult[x]["institution_name"] %> </td>
             </tr>
             <% } %>
         </table>

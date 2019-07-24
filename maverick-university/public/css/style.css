@@ -33,11 +33,11 @@ p {
     padding: 20px;
 }
 
-.name {
+/* .name {
   text-transform: capitalize;
-}
+} */
 
-.course {
+.cap {
   text-transform: capitalize;
 }
 
