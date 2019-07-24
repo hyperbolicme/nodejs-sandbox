@@ -1,0 +1,22 @@
+<head>
+    <%- include( "include/header", {title: title}   ); %>
+</head>
+
+<body>
+    <!-- <a href="/"><h1> <%= title %> </h1> </a> -->
+    <%- include( "include/top-page_mat", {title: title, username: username} ); %>
+
+    <div class="row">
+        <fieldset>
+            <form class="col s12" action="/login" method="post">
+                <div class="input-field col s12">
+                    <input name="email" type="email" class="ghost-input" placeholder="Email">
+                </div>
+                <div class="input-field col s12">
+                    <input name="password" type="password" class="ghost-input" placeholder="Password">
+                </div>
+                <input type="submit" class="waves-effect waves-light btn" value="Login">
+            </form>
+        </fieldset>
+    </div>
+</body>

@@ -1,0 +1,49 @@
+<head>
+    <%- include( "include/header", {title: title}   ); %>
+</head>
+
+<body>
+    <!-- <div class="container"> -->
+        <%- include( "include/top-page_mat", {username: username} ); %>
+
+        <div class="container-fluid">
+
+            <h1 class="name"><%= user_profile.fname %> <%= user_profile.lname %></h1>
+
+            <table class="table table-striped">
+                <tr>
+                    <th>ID</th>
+                    <td> <%= user_profile.student_id %> </td>
+                </tr>
+                <tr>
+                    <th>First Name</th>
+                    <td class="name"> <%= user_profile.fname %> </td>
+                </tr>
+                <tr>
+                    <th>Last Name</th>
+                    <td class="name"> <%= user_profile.lname %> </td>
+                </tr>
+                <tr>
+                    <th>Course</th>
+                    <td class="course"> <%= user_profile.course %> </td>
+                </tr>
+                <tr>
+                    <th>Specialication</th>
+                    <td class="spec"> <%= user_profile.specialization %> </td>
+                </tr>
+                <tr>
+                    <th>Batch</th>
+                    <td> <%= user_profile.batch %> </td>
+                </tr>
+                <tr>
+                    <th>Phone</th>
+                    <td> <%= user_profile.phone %> </td>
+                </tr>
+            </table>
+            <!-- <form >
+                <input type="submit" class="btn btn-primary" value="Go back to search results" onClick="javascript:history.go(-1)">
+            </form> -->
+
+        </div>
+    </div>
+</body>

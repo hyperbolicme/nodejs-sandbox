@@ -1,0 +1,36 @@
+<head>
+    <%- include( "include/header", {title: "Welcome to Maverick University Directory site"}   ); %>
+</head>
+
+<body>
+    <div class="row">
+        <%- include( "include/top-page_mat", {username: username} ); %>
+
+        <div class="row">
+            <% if(username !== "") { %>
+            <fieldset>
+                <form class="col s12" action="/search-result" method="post">
+                    <div class="input-field col s6">
+                        <!-- <input name="id" type="text" class="ghost-input" placeholder="Enter Student ID"> -->
+                        <input name="fname" type="text" class="ghost-input" placeholder="Enter First Name">
+                    </div>
+                    <div class="input-field col s6">
+                        <input name="lname" type="text" class="ghost-input" placeholder="Enter Last Name">
+                    </div>
+                    <!-- <input name="course" class="ghost-input" placeholder="Pick a course" list="courses"> -->
+                    <!-- <datalist id="courses">
+                        <option>B. Tech</option>
+                        <option>M. S.</option>
+                    </datalist> -->
+                    <!-- <input type="submit" class="ghost-button" value="Search Directory"> -->
+                    <input type="submit" class="btn waves-effect waves-light" value="Search Directory">
+                </form>
+            </fieldset>
+            <% } else { %>
+            <p> <a href="login">Login</a> to use the directory.</p>
+
+            <% } %>
+
+        </div>
+    </div>
+</body>

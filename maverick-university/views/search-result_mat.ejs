@@ -1,0 +1,39 @@
+<head>
+    <%- include( "include/header", {title: "Maverick University Directory: Search"}   ); %>
+</head>
+
+<body>
+    <!-- <div class="container"> -->
+    <%- include( "include/top-page_mat", {username: username} ); %>
+    <!-- <a href="/"> Search again. </a> -->
+
+    <div class="container-fluid">
+        <%= queryResult.length %> results found.
+
+        <table class="table responsive-table highlight"> 
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Course</th>
+                <th>Specialization</th>
+            </tr>
+            <% 
+            for ( x in queryResult ) {
+            %>
+            <tr>
+                <% userid = queryResult[x].student_id %>
+                <td> <%= userid %> </td>
+                <!-- <td class = "name"> <a href="user/:id=<%=userid%>"> <%= queryResult[x].name %> </a> </td> -->
+                <td class="name"> <a href="user?id=<%=userid%>">
+                        <%= queryResult[x].fname %> <%= queryResult[x].lname %> </a>
+                </td>
+                <!-- <td class = "name"> <a href="user?id=<%=userid%>"> <%=  %> </a> </td> -->
+                <td class="course"> <%= queryResult[x].course %> </td>
+                <td class="spec"> <%= queryResult[x].specialization %> </td>
+            </tr>
+            <% } %>
+        </table>
+    </div>
+
+    </div>
+</body>

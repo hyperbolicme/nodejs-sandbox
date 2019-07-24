@@ -1,17 +1,17 @@
 <head>
-        <%- include( "include/header", {title: title}   ); %>
-    </head>
-    
-    <body>
-        <div class="container">
-                <!-- <a href="/"><h1> <%= title %> </h1> </a> -->
-                <!-- <%- include( "include/top-page", {title: title, username: username} ); %> -->
+    <%- include( "include/header", {title: title}   ); %>
+</head>
+
+<body>
+    <div class="container">
+        <!-- <a href="/"><h1> <%= title %> </h1> </a> -->
+        <%- include( "include/top-page", {title: title, username: username} ); %>
 
         <fieldset>
             <form action="/login" method="post">
                 <input name="email" type="email" class="ghost-input" placeholder="Email">
                 <input name="password" type="password" class="ghost-input" placeholder="Password">
-                
+
                 <input type="submit" class="btn btn-primary" value="Login">
             </form>
         </fieldset>

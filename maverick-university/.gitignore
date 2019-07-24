@@ -11,4 +11,8 @@ views/login_boot.ejs
 views/search_boot.ejs
 views/search_result_boot.ejs
 ../package-lock.json
-
+*.tsv
+*.csv
+scratch*
+../materialize
+js/schema_db_ejs.js
