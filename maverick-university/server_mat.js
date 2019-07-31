@@ -13,10 +13,15 @@ const url = require("url");
 const mongoAdmin = "akira";
 const mongoAdminPass = "welcomehome";
 const mongoUrl = `mongodb+srv://${mongoAdmin}:${mongoAdminPass}@clustermaverick-idrtx.mongodb.net/test?retryWrites=true&w=majority`;
+// const mongoUrl = `mongodb://localhost:27017`;
 const mongoDirectoryDb = "studentdb";
-const mongoDirectoryCollection = "fa_testdata_users";
+const mongoUserDirectoryCollection = "fa_testdata_users";
+// const mongoDirectoryNormCollection = "fa_testdata_denormalized";
+const mongoDirectoryNormCollection = "fa_testdata_denormalized2";
 const mongoCredsCollection = "usercreds";
 
+var nReturned = 0;
+var executionTimeMillis = 0;
 
 // Mongodb querying logic is mostly common except
 // the call back in .toArray() / what you do with result.
@@ -34,11 +39,39 @@ function queryDb(dbname, collectionName, query, callback) {
 
             // Query username and password
             console.log(`Query on collection ${collectionName}: ${JSON.stringify(query)}`)
-            let qresult = dbo.collection(collectionName).find(query);
+            let qresult, stats;
 
+            if (0 && collectionName === mongoDirectoryNormCollection) {
+                console.log("Querying by aggregate. ");
+                qresult = dbo.collection(collectionName).aggregate([
+                    { $match: query }
+                ]);
+                // stats = dbo.collection(collectionName).explain().aggregate([
+                //     { $unwind: "$all_circuits" },
+                //     { $match: query }
+                // ]);
+            }
+            else {
+                qresult = dbo.collection(collectionName).find(query);
+                stats = dbo.collection(collectionName).find(query);
+                stats.explain(function (err, executionStats) {
+                    nReturned = executionStats.executionStats.nReturned;
+                    executionTimeMillis = executionStats.executionStats.executionTimeMillis;
+                    console.log(`[STATS] Query ${JSON.stringify(query)} returned ${nReturned} in ${executionTimeMillis} ms.`);
+                });
+            }
             // pass the intended callback to result.
             qresult.toArray(callback);
             // db.close();
+
+            // "executionStats"
+            // qresult = dbo.collection(collectionName).find(query);
+            // stats.explain(function (err, executionStats) {
+            //     nReturned = executionStats.executionStats.nReturned;
+            //     executionTimeMillis = executionStats.executionStats.executionTimeMillis;
+            //     console.log(`[STATS] Query ${JSON.stringify(query)} returned ${nReturned} in ${executionTimeMillis} ms.`);
+            // });
+
         });
 };
 
@@ -198,12 +231,45 @@ app.post("/search-result",
             query["current_designation"] = { $regex: `${req.body.ul_designation}`, $options: "i" } : {};
         req.body.city_ids !== "" ?
             query["city_id"] = { $regex: `${req.body.city_ids}`, $options: "i" } : {};
+        req.body.ul_inst_name !== "" ?
+            query["institution_name"] = { $regex: `${req.body.ul_inst_name}`, $options: "i" } : {};
+        req.body.ul_sector !== "" ?
+            query["industry_type_id"] = { $regex: `${req.body.ul_sector}`, $options: "i" } : {};
+
+        if (req.body.specialization_list !== undefined && req.body.specialization_list.length !== 0) {
+            // let x = {}, y = {};
+            // x["specialization_id"] = { $in: req.body.specialization_list };
+            // y["circuit_id_merged"] = x;
+            // query["all_circuits"] = y;
+
+            let specialization_list_regex = [];
+            for (let i = 0; i < req.body.specialization_list.length; i++) {
+                specialization_list_regex[i] = (new RegExp(req.body.specialization_list[i]));
+            }
+
+            console.log(`Spec regex list: ${specialization_list_regex} `)
+            // query["all_circuits"] = { "circuit_id_merged": { "specialization_id": { $in: specialization_list_regex } } };
+            query["specialization_id"] = { $in: specialization_list_regex } ;
+
+        };
+
+        if (req.body.batch_list !== undefined && req.body.batch_list.length !== 0) {
+            let batch_list_regex = [];
+            for (let i = 0; i < req.body.batch_list.length; i++) {
+                batch_list_regex[i] = (new RegExp(req.body.batch_list[i])); 
+            }
+
+            console.log(`Batch regex list: ${batch_list_regex} `);
+            // query["all_circuits"] = { "circuit_id_merged": { "batch": { $in: batch_list_regex } } };
+            // query["all_circuits.circuit_id_merged.batch"] = { $in: batch_list_regex } ;
+            // query["batch"] = { $in: batch_list_regex } ;
+            query["batch"] = { $in: batch_list_regex } ;
+        }
 
         console.log(`Query is ${JSON.stringify(query)}`);
-        var start_time = new Date();
 
         queryDb(mongoDirectoryDb,
-            mongoDirectoryCollection,
+            mongoDirectoryNormCollection,
             query,
             function (err, result) {
                 if (err) {
@@ -211,23 +277,15 @@ app.post("/search-result",
                     resp.end();
                 }
                 console.log(`Found ${result.length} entries.`);
-                // console.log(`${JSON.stringify(result)}`);
-
-                var end_time = new Date();
-                var time_diff = (end_time - start_time) / 1000;
-                console.log(`Took ${time_diff} seconds to fetch.`)
 
                 resp.render("search-result_mat", {
                     title: title,
                     queryResult: result,
                     username: username,
-                    timeDiff: time_diff
+                    timeDiff: executionTimeMillis
                 });
             });
-        // end_time2 = new Date();
-        // time_diff2 = (end_time2 - start_time) / 1000;
-        // console.log(`Took ${time_diff2} seconds to fetch2.`)
-
+ 
 
     });
 
@@ -252,7 +310,7 @@ app.post('/login',
     passport.authenticate('local',
         {
             successRedirect: '/login2',
-            failureRedirect: '/login_mat'
+            failureRedirect: '/login'
         }));
 
 // Route to render home page with right url after login
@@ -284,7 +342,7 @@ app.get("/user", function (req, resp) {
     console.log(`id = ${req.query.id}`);
 
     queryDb(mongoDirectoryDb,
-        mongoDirectoryCollection,
+        mongoUserDirectoryCollection,
         { "user_id": parseInt(req.query.id) },
         function (err, result) {
             console.log(result);

@@ -12,3 +12,4 @@ echo "mongoimport --host ClusterMaverick-shard-0/clustermaverick-shard-00-00-idr
 
 echo "mongoimport --host ClusterMaverick-shard-0/clustermaverick-shard-00-00-idrtx.mongodb.net:27017,clustermaverick-shard-00-01-idrtx.mongodb.net:27017,clustermaverick-shard-00-02-idrtx.mongodb.net:27017 --ssl --username akira --authenticationDatabase admin --db studentdb --drop --collection fa_testdata_users --type tsv --headerline --file mongo_userlist.tsv"
 
+echo "mongo "mongodb+srv://clustermaverick-idrtx.mongodb.net/test" --username akira"
